@@ -1,0 +1,11 @@
+# Generated release packages
+dist/
+__pycache__/
+*.pyc
+
+# Local credentials and personal progress backups
+.env
+.env.*
+*.pem
+*.key
+udemy-mine-backup-*.json

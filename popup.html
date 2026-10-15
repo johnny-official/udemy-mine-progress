@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Udemy Mine Progress</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand-icon">U<span>.</span></div>
+      <div class="brand-copy">
+        <div class="overline">LOCAL FIRST / CHROME</div>
+        <h1 data-i18n="page.title">My Udemy Progress</h1>
+        <p data-i18n="header.note">Only on this computer. Does not use shared account progress.</p>
+      </div>
+    </header>
+    <label class="language-row"><span data-i18n="language">Language</span><select id="language" aria-label="Language"><option value="en">English</option><option value="vi">Tiếng Việt</option></select></label>
+    <section class="summary" aria-label="Overview" data-i18n-aria="summary.label">
+      <div><strong id="course-count">0</strong><span data-i18n="course.count">Courses</span></div>
+      <div><strong id="lecture-count">0</strong><span data-i18n="lecture.count">Videos saved</span></div>
+      <div class="summary-status"><span class="status-dot"></span> <span data-i18n="saving">Saved locally</span></div>
+    </section>
+    <section class="section-head"><h2 data-i18n="continue.learning">Continue learning</h2><span data-i18n="recent">Most recent</span></section>
+    <div id="courses" class="courses" aria-live="polite"></div>
+    <section class="settings">
+      <h2 data-i18n="settings">Automatic settings</h2>
+      <label class="setting-row"><span><strong data-i18n="seek.title">Restore playback position</strong><small data-i18n="seek.help">Seek to each video’s saved timestamp</small></span><input id="auto-seek" type="checkbox" checked></label>
+      <label class="setting-row"><span><strong data-i18n="jump.title">Return to most recent lesson</strong><small data-i18n="jump.help">When opening a new course in a tab from Udemy</small></span><input id="auto-jump" type="checkbox" checked></label>
+    </section>
+    <section class="backup">
+      <h2 data-i18n="backup">Back up data</h2>
+      <div class="buttons"><button id="export" class="button-secondary" type="button" data-i18n="export">↓ Export JSON</button><button id="import" class="button-secondary" type="button" data-i18n="import">↑ Import JSON</button></div>
+      <input id="import-file" type="file" accept=".json,application/json" hidden>
+      <button id="clear" class="clear" type="button" data-i18n="clear">Delete all progress on this computer</button>
+    </section>
+    <p id="message" class="message" role="status" aria-live="polite"></p>
+    <footer data-i18n="privacy">No email or password is collected, and no data is sent to a server.</footer>
+  </main>
+  <script src="core.js"></script>
+  <script src="i18n.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

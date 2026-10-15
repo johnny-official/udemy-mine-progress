@@ -1,0 +1,23 @@
+#ump-resume-prompt {
+  position: fixed !important;
+  z-index: 2147483646 !important;
+  right: 20px !important;
+  bottom: 22px !important;
+  width: min(355px, calc(100vw - 40px)) !important;
+  box-sizing: border-box !important;
+  padding: 15px 16px !important;
+  background: #121827 !important;
+  color: #ffffff !important;
+  border: 1px solid #475569 !important;
+  border-radius: 13px !important;
+  box-shadow: 0 14px 45px rgba(0,0,0,.3) !important;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+  line-height: 1.45 !important;
+  font-size: 13px !important;
+}
+#ump-resume-prompt .ump-title { font-size: 14px !important; font-weight: 700 !important; margin-bottom: 5px !important; }
+#ump-resume-prompt .ump-desc { color: #d2dce9 !important; margin-bottom: 11px !important; }
+#ump-resume-prompt .ump-actions { display: flex !important; align-items: center !important; gap: 9px !important; }
+#ump-resume-prompt button { cursor: pointer !important; border: 0 !important; border-radius: 8px !important; font: 600 12px system-ui,sans-serif !important; padding: 8px 12px !important; }
+#ump-resume-prompt .ump-go { background: #6dffe1 !important; color: #0a2630 !important; }
+#ump-resume-prompt .ump-dismiss { background: #344054 !important; color: white !important; }

@@ -1,0 +1,108 @@
+name: CI and Release
+
+on:
+  pull_request:
+  push:
+    branches: ['**']
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  build:
+    name: Test and package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in *.js tests/*.js; do node --check "$file"; done
+      - name: Run tests
+        run: |
+          node tests/core.test.js
+          node tests/content.test.js
+          node tests/localization.test.js
+          python3 scripts/release.py --self-test
+      - name: Build verified release package
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$REF_TYPE" == tag ]]; then
+            python3 scripts/release.py --tag "$REF_NAME"
+          else
+            python3 scripts/release.py
+          fi
+      - name: Upload tested package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: extension-package
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Publish GitHub Release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download the tested package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: extension-package
+          path: dist
+      - name: Verify checksum
+        working-directory: dist
+        run: sha256sum --check SHA256SUMS.txt
+      - name: Create English release notes and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/$GH_REPO/releases/generate-notes" \
+            -f tag_name="$RELEASE_TAG" --jq '.body' > changes.md
+          cat > notes.md <<'NOTES'
+          ## Install
+          1. Download `udemy-mine-progress-*.zip` from **Assets** below (not the source-code archives).
+          2. Extract the ZIP, open `chrome://extensions`, and enable **Developer mode**.
+          3. Select **Load unpacked** and choose the extracted folder containing `manifest.json`.
+
+          ## Update safely
+          Export your progress as JSON first. Replace the files in your existing extension folder, click **Reload**, then reload Udemy tabs. Avoid uninstalling: it can delete local progress.
+
+          ## Language and privacy
+          English by default, with Vietnamese available in the popup. Progress stays in this browser profile; no cloud sync. This project is not affiliated with Udemy.
+
+          ## Verification
+          This ZIP passed automated tests. `SHA256SUMS.txt` contains its SHA-256 checksum. Automated tests do not replace testing with Udemy's live player.
+
+          ## Changes
+          NOTES
+          cat changes.md >> notes.md
+          gh release create "$RELEASE_TAG" dist/*.zip dist/SHA256SUMS.txt \
+            --repo "$GH_REPO" --verify-tag \
+            --title "Udemy Mine Progress $RELEASE_TAG" --notes-file notes.md

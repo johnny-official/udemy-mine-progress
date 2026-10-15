@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Udemy Mine Progress",
+  "short_name": "My Udemy",
+  "version": "1.0.0",
+  "description": "Save and restore your Udemy video progress locally, independently of account progress.",
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "Udemy Mine Progress",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.udemy.com/*"],
+      "js": ["core.js", "i18n.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}
